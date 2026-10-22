@@ -1,0 +1,4 @@
+# arquivos internos da API nunca são servidos diretamente
+<FilesMatch "^_">
+Require all denied
+</FilesMatch>

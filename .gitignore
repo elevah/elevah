@@ -200,3 +200,7 @@ dist
 
 ### Astro ###
 .astro/
+
+# Site Hostinger: segredos e dados de leads nunca vão para o GitHub
+public_html/api/_config.php
+public_html/api/leads/*.csv
