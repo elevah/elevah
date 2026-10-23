@@ -14,11 +14,14 @@ RewriteEngine On
 RewriteCond %{HTTPS} off [OR]
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^ https://elevah.tech%{REQUEST_URI} [L,R=301]
+# Consultorias antigas → Plataforma Elevah (o diagnóstico online /diagnostico NÃO é redirecionado)
+RewriteRule ^servicos/elevah-diagnostic(/.*)?$ /plataforma [L,R=301]
+RewriteRule ^servicos/elevah-business-performance(/.*)?$ /plataforma [L,R=301]
+RewriteRule ^servicos/?$ /plataforma [L,R=301]
 # Endereços do site anterior → páginas novas
-RewriteRule ^elevah-signatuur/?$ /servicos/elevah-business-performance [L,R=301]
-RewriteRule ^elevah-growth-experience/?$ /servicos/elevah-diagnostic [L,R=301]
+RewriteRule ^elevah-signatuur/?$ /plataforma [L,R=301]
+RewriteRule ^elevah-growth-experience/?$ /plataforma [L,R=301]
 RewriteRule ^contato/?$ /#contato [NE,L,R=301]
-RewriteRule ^servicos/?$ /#solucoes [NE,L,R=301]
 RewriteRule ^artigos/?$ /conteudos [L,R=301]
 # URLs com index.html (ex.: /index.html, /sobre/index.html) → endereço limpo
 RewriteCond %{THE_REQUEST} \s/+(.*?/)?index\.html[\s?] [NC]

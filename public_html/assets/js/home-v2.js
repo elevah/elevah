@@ -1,13 +1,13 @@
-/* Elevah — página inicial V2: abas "Da informação à decisão", FAQ com uma pergunta aberta
+/* Elevah V2 — abas acessíveis (soluções e exemplos de decisão), FAQ com uma pergunta aberta
    e eventos de conversão. Complementa site.js sem alterar o que ele já faz. */
 (function () {
   'use strict';
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var track = function (n, p) { if (window.elevahTrack) window.elevahTrack(n, p || {}); };
 
-  /* ---------- abas acessíveis ---------- */
-  $$('[data-demo]').forEach(function (demo) {
-    var tabs = $$('[role="tab"]', demo);
+  /* ---------- abas: [data-tabs="evento"] com role=tab / role=tabpanel ---------- */
+  $$('[data-tabs]').forEach(function (box) {
+    var tabs = $$('[role="tab"]', box), evt = box.getAttribute('data-tabs');
     function select(tab, focus) {
       tabs.forEach(function (t) {
         var on = t === tab, panel = document.getElementById(t.getAttribute('aria-controls'));
@@ -21,7 +21,7 @@
       tab.addEventListener('click', function () {
         if (tab.getAttribute('aria-selected') === 'true') return;
         select(tab, false);
-        track('exemplo_decisao', { exemplo: (tab.querySelector('strong') || tab).textContent.trim() });
+        if (evt) track(evt, { item: (tab.querySelector('[data-tab-name]') || tab).textContent.trim(), pagina: location.pathname });
       });
       tab.addEventListener('keydown', function (e) {
         var k = e.key, n = tabs.length, j = null;
