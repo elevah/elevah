@@ -415,3 +415,41 @@
 .decide-list{grid-template-columns:1fr}
 .cta--v3{padding-bottom:clamp(220px,22vw,320px)}
 main:has(#valor) .s3-flag{border-radius:16px}
+
+/* =========================================================
+   Página inicial · revisão 4 (narrativa: situação → consequência → benefício)
+   ========================================================= */
+/* problemas: nome → situação → consequência */
+.problems--simple .problem h3{font-size:clamp(25px,2.1vw,30px)}
+.problems--simple .problem-top b{font-size:12px;opacity:.7}
+.problems--simple .problem-sub{font-size:clamp(16px,1.25vw,18px);color:var(--paper-ink)}
+.problem-cons{margin-top:auto;padding-top:14px;border-top:1px solid var(--paper-line);font-size:14.5px;line-height:1.5;color:var(--copper-ink)}
+
+/* valor: benefício → aplicação → resultado */
+.value{gap:14px}
+.value p:not(.value-out){font-size:16.5px;color:var(--paper-muted)}
+.value-out{margin-top:auto;padding-top:14px;border-top:1px solid rgba(47,104,120,.18);font-size:14.5px;line-height:1.45;font-weight:500;color:var(--signal)}
+.value-out span{display:block;margin-bottom:4px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper-muted);font-weight:500}
+
+/* soluções: o benefício é o título do painel (categoria só na aba) */
+.sx-panel{grid-template-columns:minmax(0,45fr) minmax(0,55fr)}
+.sx-title{font-size:clamp(28px,2.9vw,42px);font-weight:300;letter-spacing:-.04em;line-height:1.08;color:#fff;text-wrap:balance}
+.sx-desc{font-size:clamp(16px,1.25vw,18px);color:var(--ink-muted)}
+.sx-caps li{font-size:14.5px;color:var(--ink-muted)}
+.sx-close{font-family:var(--font-serif);font-size:17px;line-height:1.4;color:var(--accent-soft)}
+@media (max-width:960px){.sx-panel{grid-template-columns:1fr}}
+
+/* decisão: oferta → análise → decisão */
+.decide-q{font-size:clamp(30px,3.2vw,46px)}
+.decide-flow{display:grid;gap:0;width:100%}
+.decide-flow li{position:relative;display:grid;grid-template-columns:44px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--paper-line)}
+.decide-flow li:last-child{border-bottom:1px solid var(--paper-line)}
+.decide-flow b{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;font-size:13px;font-weight:500;color:var(--signal);background:rgba(47,104,120,.08);box-shadow:inset 0 0 0 1px rgba(47,104,120,.2);font-variant-numeric:tabular-nums}
+.decide-flow li:last-child b{color:#fff;background:var(--signal);box-shadow:none}
+.decide-flow strong{display:block;margin-bottom:4px;font-size:17px;font-weight:500;letter-spacing:-.015em;color:var(--paper-ink)}
+.decide-flow p{font-size:15px;line-height:1.5;color:var(--paper-muted)}
+.decide-shot{display:grid;gap:18px}
+.decide-shot .decide-out{margin:0}
+.value h3{font-size:clamp(26px,2.5vw,36px)}
+.sx-copy{gap:18px}
+.sx-close{padding-top:4px}
