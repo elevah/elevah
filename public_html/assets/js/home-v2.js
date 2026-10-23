@@ -14,6 +14,7 @@
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
         if (panel) panel.classList.toggle('is-active', on);
+        $$('[data-for="' + t.getAttribute('aria-controls') + '"]', box).forEach(function (el) { el.classList.toggle('is-active', on); });
       });
       if (focus) tab.focus();
     }
@@ -34,6 +35,44 @@
         select(tabs[j], true);
       });
     });
+  });
+
+  /* ---------- navegação interna da página (seção ativa + respeito ao cabeçalho) ---------- */
+  var sub = document.querySelector('.pp-subnav');
+  if (sub) {
+    var links = $$('a[data-spy]', sub), header = document.querySelector('.header');
+    var syncTop = function () { sub.classList.toggle('is-up', !!(header && header.classList.contains('is-hidden'))); };
+    if (header && 'MutationObserver' in window) new MutationObserver(syncTop).observe(header, { attributes: true, attributeFilter: ['class'] });
+    if ('IntersectionObserver' in window) {
+      var current = '';
+      var io = new IntersectionObserver(function (en) {
+        en.forEach(function (e) { if (e.isIntersecting) current = e.target.id; });
+        links.forEach(function (a) { var on = a.getAttribute('data-spy') === current; a.classList.toggle('is-active', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+      }, { rootMargin: '-45% 0px -50% 0px' });
+      $$('main > section[id], main > div > section[id]').forEach(function (t) { io.observe(t); }); // seções fora da lista limpam o destaque
+    }
+  }
+
+  /* ---------- ampliação das capturas (só quando há imagem real) ---------- */
+  $$('[data-zoom]').forEach(function (fig) {
+    var img = fig.querySelector('.visual-img');
+    if (!img) return;
+    fig.classList.add('is-zoomable');
+    fig.setAttribute('tabindex', '0'); fig.setAttribute('role', 'button');
+    fig.setAttribute('aria-label', 'Ampliar imagem: ' + (img.alt || ''));
+    function open() {
+      var box = document.createElement('div');
+      box.className = 'lightbox'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', img.alt || 'Imagem ampliada');
+      box.innerHTML = '<button class="iconbtn lightbox-close" type="button" aria-label="Fechar">×</button>';
+      var big = img.cloneNode(); big.removeAttribute('loading'); big.className = 'lightbox-img'; box.appendChild(big);
+      function close() { box.remove(); document.removeEventListener('keydown', esc); fig.focus(); }
+      function esc(e) { if (e.key === 'Escape') close(); }
+      box.addEventListener('click', function (e) { if (e.target !== big) close(); });
+      document.addEventListener('keydown', esc);
+      document.body.appendChild(box); box.querySelector('button').focus();
+    }
+    fig.addEventListener('click', open);
+    fig.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
 
   /* ---------- FAQ: uma pergunta aberta por vez (navegadores sem <details name>) ---------- */
