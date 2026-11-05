@@ -288,11 +288,11 @@
   function hbars(entries, color, max) {
     max = max || Math.max(1, ...entries.map(e => e.v));
     if (!entries.length) return '<div class="empty small">Sem conteúdos no período.</div>';
-    return `<div class="hbars">${entries.map(e => `<div class="hbar"><span class="name" title="${esc(e.name)}">${esc(e.name)}</span><span class="track"><span class="fill" style="display:block;width:${e.v / max * 100}%;background:${e.color || color || 'var(--accent)'}"></span></span><span class="v">${e.label != null ? e.label : e.v}</span></div>`).join('')}</div>`;
+    return `<div class="hbars">${entries.map(e => `<div class="hbar"><span class="name" title="${esc(e.name)}">${esc(e.name)}</span><span class="track"><span class="fill" style="display:block;width:${e.v / max * 100}%;background:${e.color || color || 'var(--ink)'}"></span></span><span class="v">${e.label != null ? e.label : e.v}</span></div>`).join('')}</div>`;
   }
 
-  function recCard(rc) {
-    return `<div class="rec"><div class="rec-head"><span class="rec-sev ${rc.sev}"></span><div class="stack" style="gap:3px;flex:1;min-width:0"><span class="rec-title">${esc(rc.title)}</span><span class="small muted">${esc(rc.text)}</span></div></div>
+  function recCard(rc, first) {
+    return `<div class="rec ${first === true ? 'first' : ''}"><div class="rec-head"><span class="rec-sev ${rc.sev}"></span><div class="stack" style="gap:3px;flex:1;min-width:0"><span class="rec-title">${esc(rc.title)}</span><span class="small muted">${esc(rc.text)}</span></div></div>
       ${rc.sugs && rc.sugs.length ? `<div class="rec-sugs">${rc.sugs.map(i => `<div class="rec-sug"><span><span class="small" style="font-weight:550">${esc(i.title)}</span><br><span class="tiny muted">${M.fmt[i.format].name} · ${M.ch[i.channel].name} · ${esc(M.pillar[i.pillar].name)}</span></span>
         <button class="btn sm" data-act="add-idea" data-id="${i.id}" title="Agendar no próximo espaço livre">Adicionar em ${fmtD(nextSlot(i.channel))}</button></div>`).join('')}</div>` : ''}
       ${rc.items && rc.items.length ? `<div class="rec-sugs">${rc.items.map(it => `<div class="rec-sug"><span class="small">${esc(it.title)} <span class="tiny muted">· ${fmtD(it.date)}</span></span><button class="btn sm" data-act="open-item" data-id="${it.id}">Reclassificar</button></div>`).join('')}</div>` : ''}
@@ -342,17 +342,17 @@
     const tc = countBy(list, 'theme');
     const reps = Object.entries(tc).filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]);
 
-    return `<div class="page-head"><div><h1>Painel editorial</h1><p>${esc(r.label)} · ${d.n} conteúdos planejados${activeFilters() ? ' (filtrado)' : ''}</p></div>
+    return `<div class="page-head"><div><h1>Painel <em>editorial</em></h1><p>${esc(r.label)} · ${d.n} conteúdos planejados${activeFilters() ? ' (filtrado)' : ''}</p></div>
       <div class="head-actions">${seg('period', [['week', 'Semana'], ['month', 'Mês'], ['custom', 'Período']], S.period.mode)}
         <button class="btn sm ghost" data-act="period-prev" aria-label="Período anterior">‹</button><button class="btn sm ghost" data-act="period-next" aria-label="Próximo período">›</button>${customInputs}
         <button class="btn sm" data-act="${S.sim ? 'sim-discard' : 'sim-start'}">${S.sim ? 'Sair da simulação' : 'Simular alterações'}</button></div></div>
       ${simBanner()}${filterBar()}
 
-      <div class="label">Cobertura planejada</div>
+      <div class="sech"><span class="n">1</span><h2>Cobertura planejada</h2><span class="d">O que a estratégia está priorizando</span></div>
       <div class="grid g4">
         <div class="card kpi"><span class="label">Planejados</span><b>${d.n}</b><span class="sub">${pub.length} publicados · ${pending.length} pendentes</span></div>
         <div class="card kpi"><span class="label">Aderência às metas</span><b>${S.useTargets ? scoreAdh + '%' : '—'}</b><span class="sub">${S.useTargets ? '100% = distribuição igual à meta' : 'Metas desativadas'}</span></div>
-        <div class="card kpi"><span class="label">Etapa com maior lacuna</span><b style="font-size:20px">${(() => { if (!S.useTargets || !d.n) return '—'; const w = E.stages.map(s => [s, d.p[s.id] - S.targets[s.id]]).sort((a, b) => a[1] - b[1])[0]; return w[1] < -S.tolerance ? w[0].name : 'Nenhuma'; })()}</b><span class="sub">Tolerância de ±${S.tolerance} pp</span></div>
+        <div class="card kpi"><span class="label">Etapa com maior lacuna</span><b style="font-size:30px">${(() => { if (!S.useTargets || !d.n) return '—'; const w = E.stages.map(s => [s, d.p[s.id] - S.targets[s.id]]).sort((a, b) => a[1] - b[1])[0]; return w[1] < -S.tolerance ? w[0].name : 'Nenhuma'; })()}</b><span class="sub">Tolerância de ±${S.tolerance} pp</span></div>
         <div class="card kpi"><span class="label">Atrasados</span><b style="color:${late.length ? 'var(--crit)' : 'inherit'}">${late.length}</b><span class="sub">Data passada sem publicação</span></div>
       </div>
 
@@ -364,7 +364,7 @@
           <a class="small" href="#ajustes">Editar metas</a></div>
         </div>
         <div class="card"><div class="card-head"><div><h2>Recomendações</h2><p>Com base no planejado do período.</p></div><span class="chip">${recs.length}</span></div>
-          <div class="stack">${recs.length ? recs.slice(0, 5).map(recCard).join('') : '<div class="empty small">Distribuição equilibrada. Nada a corrigir agora.</div>'}</div>
+          <div class="stack">${recs.length ? recs.slice(0, 5).map((r, i) => recCard(r, i === 0)).join('') : '<div class="empty small">Distribuição equilibrada. Nada a corrigir agora.</div>'}</div>
         </div>
       </div>
 
@@ -382,19 +382,19 @@
           <div class="stack">${E.associations.map(a => { const n = asc[a.id] || 0; return `<div class="cov"><span style="width:150px;flex:none">${esc(a.name)}</span>${chip(PRIO_N[S.assocPriority[a.id]], S.assocPriority[a.id] === 'alta' ? 'acc' : '')}<span class="track"><span class="fill" style="display:block;width:${pct(n, Math.max(1, list.length))}%"></span></span><span class="num" style="width:28px;text-align:right">${n}</span></div>`; }).join('')}</div></div>
       </div>
 
-      <div class="label">Execução</div>
+      <div class="sech"><span class="n">2</span><h2>Execução</h2><span class="d">O que foi produzido e publicado</span></div>
       <div class="grid g2">
         <div class="card"><div class="card-head"><div><h2>Planejado × publicado</h2><p>Por etapa do funil, no período.</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Etapa</th><th class="n">Planejado</th><th class="n">Publicado</th><th class="n">%</th></tr></thead><tbody>
           ${E.stages.map(s => { const a = all.filter(i => i.stage === s.id).length; const b = pub.filter(i => i.stage === s.id).length; return `<tr><td>${stageChip(s.id)}</td><td class="n">${a}</td><td class="n">${b}</td><td class="n">${a ? pct(b, a) + '%' : '—'}</td></tr>`; }).join('')}
           </tbody></table></div>
           <div class="row" style="margin-top:12px">${E.statuses.map(s => { const n = all.filter(i => i.status === s.id).length; return n ? chip(`${s.name}: ${n}`) : ''; }).join('')}</div></div>
-        <div class="card"><div class="card-head"><div><h2>Frequência por semana</h2><p>${consistent} de ${weeks.length} semanas atingem a cadência de ${cadN} publicações.</p></div><div class="legend"><span><i style="background:var(--st-int)"></i>Instagram</span><span><i style="background:var(--st-desc)"></i>LinkedIn</span></div></div>
-          <div class="colbars">${perWeek.map(x => `<div class="colbar"><span class="num tiny">${x.ig + x.li}</span><div class="stk" style="height:${(x.ig + x.li) / maxW * 90 + 2}px"><div style="flex:${x.li};background:var(--st-desc)"></div><div style="flex:${x.ig};background:var(--st-int)"></div></div><small>${fmtD(x.w)}</small></div>`).join('')}</div>
+        <div class="card"><div class="card-head"><div><h2>Frequência por semana</h2><p>${consistent} de ${weeks.length} semanas atingem a cadência de ${cadN} publicações.</p></div><div class="legend"><span><i style="background:var(--ink)"></i>Instagram</span><span><i style="background:var(--blue)"></i>LinkedIn</span></div></div>
+          <div class="colbars">${perWeek.map(x => `<div class="colbar"><span class="num tiny">${x.ig + x.li}</span><div class="stk" style="height:${(x.ig + x.li) / maxW * 90 + 2}px"><div style="flex:${x.li};background:var(--blue)"></div><div style="flex:${x.ig};background:var(--ink)"></div></div><small>${fmtD(x.w)}</small></div>`).join('')}</div>
           ${reps.length ? `<div class="divider" style="margin:12px 0"></div><span class="label">Temas mais repetidos</span><div class="chips" style="margin-top:6px">${reps.slice(0, 5).map(([t, n]) => chip(`${THEMES[t] ? THEMES[t].name : t} · ${n}`, n >= 3 ? 'flag' : '')).join('')}</div>` : ''}</div>
       </div>
 
-      <div class="label">Desempenho</div>
+      <div class="sech"><span class="n">3</span><h2>Desempenho</h2><span class="d">Como o publicado performou</span></div>
       <div class="card"><div class="spread"><div class="stack" style="gap:4px"><h2>Resultados do período</h2><span class="small muted">Cobertura alinhada à meta não garante resultado. Desempenho é analisado à parte.</span></div>
         <div class="row" style="gap:28px"><div class="kpi"><span class="label">Com métricas</span><b>${allPub.length}</b></div><div class="kpi"><span class="label">Alcance somado</span><b>${nf(reach)}</b></div>
         <div class="kpi" style="max-width:260px"><span class="label">Maior alcance</span><span class="small">${topPub ? esc(topPub.title) : '—'}</span></div>
@@ -423,7 +423,7 @@
     } else if (S.calView === 'list') {
       const undated = S.items.filter(it => !it.date && passFilters(it));
       const rows = list.slice().sort((a, b) => a.date.localeCompare(b.date)).concat(undated);
-      body = `<div class="card flat" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Data</th><th>Conteúdo</th><th>Etapa</th><th>Pilar</th><th>Objetivo</th><th>Público</th><th>Canal</th><th>Formato</th><th>Status</th><th>Prio.</th><th>Resp.</th></tr></thead><tbody>
+      body = `<div class="card" style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Data</th><th>Conteúdo</th><th>Etapa</th><th>Pilar</th><th>Objetivo</th><th>Público</th><th>Canal</th><th>Formato</th><th>Status</th><th>Prio.</th><th>Resp.</th></tr></thead><tbody>
         ${rows.map(it => `<tr class="click" data-act="open-item" data-id="${it.id}"><td class="num">${fmtD(it.date)}</td><td style="min-width:240px">${it.review ? '<span class="chip flag">Revisar</span> ' : ''}${esc(it.title)}</td><td>${stageChip(it.stage)}</td><td class="small">${esc(M.pillar[it.pillar].name)}</td><td class="small">${esc(M.obj[it.objective].name)}</td><td class="small">${esc(M.role[it.audience].name)}</td><td>${M.ch[it.channel].short}</td><td class="small">${esc(M.fmt[it.format].name)}</td><td class="small">${M.status[it.status].name}</td><td>${prioDots(it.priority)}</td><td class="small">${esc(it.owner)}</td></tr>`).join('') || '<tr><td colspan="11" class="muted">Nenhum conteúdo.</td></tr>'}
       </tbody></table></div></div>`;
     } else {
@@ -432,10 +432,10 @@
     }
     const slots = openSlots(r);
     const recs = recommendations(r).filter(x => x.key.startsWith('st-') || x.key.startsWith('ov-'));
-    return `<div class="page-head"><div><h1>Calendário editorial</h1><p>Arraste para reagendar${S.calView === 'pipeline' ? ' ou mudar de status' : ''}. Clique para abrir o detalhe.</p></div>
+    return `<div class="page-head"><div><h1>Calendário <em>editorial</em></h1><p>Arraste para reagendar${S.calView === 'pipeline' ? ' ou mudar de status' : ''}. Clique para abrir o detalhe.</p></div>
       <div class="head-actions">${seg('cal-view', [['month', 'Mês'], ['week', 'Semana'], ['list', 'Lista'], ['pipeline', 'Pipeline']], S.calView)}
         <button class="btn sm ghost" data-act="cal-prev" aria-label="Anterior">‹</button><button class="btn sm" data-act="cal-today">Hoje</button><button class="btn sm ghost" data-act="cal-next" aria-label="Próximo">›</button>
-        <span style="font-weight:600;min-width:130px">${esc(label)}</span>
+        <span class="period-label">${esc(label)}</span>
         <button class="btn sm" data-act="${S.sim ? 'sim-discard' : 'sim-start'}">${S.sim ? 'Sair da simulação' : 'Simular'}</button>
         <button class="btn primary sm" data-act="new-item">Nova pauta</button></div></div>
       ${simBanner()}${filterBar()}
@@ -443,7 +443,7 @@
         <div style="min-width:0">${body}</div>
         <aside class="stack">
           <div class="card"><div class="card-head"><h3>Distribuição do funil</h3><span class="tiny muted">${list.length} no período</span></div>${distBars(list, { compact: true, ghost: S.sim ? planned(r, S.sim) : null })}</div>
-          ${recs.length ? `<div class="stack">${recs.slice(0, 2).map(recCard).join('')}</div>` : ''}
+          ${recs.length ? `<div class="card stack" style="padding:14px">${recs.slice(0, 2).map(r => recCard(r)).join('')}</div>` : ''}
           <div class="card"><div class="card-head"><h3>Espaços livres</h3><span class="tiny muted">${slots.length}</span></div>
             ${slots.length ? `<div class="stack" style="gap:6px">${slots.slice(0, 6).map(s => `<button class="slot-hint" data-act="pick" data-date="${s.date}" data-ch="${s.ch}">${fmtDL(s.date)} · ${M.ch[s.ch].name}</button>`).join('')}</div>` : '<p class="small muted">Cadência completa no período.</p>'}
             <p class="tiny muted" style="margin-top:8px">Cadência: Instagram ${cadenceDays('ig').map(i => WD[i]).join(', ')} · LinkedIn ${cadenceDays('li').map(i => WD[i]).join(', ')}. <a href="#ajustes">Alterar</a></p></div>
@@ -459,7 +459,7 @@
     if (UI.libScope === 'in') list = list.filter(i => used.has(i.id));
     list.sort(UI.libSort === 'prio' ? (a, b) => (b.priority + (PRIO_W[S.assocPriority[b.assoc]] || 0) * .5) - (a.priority + (PRIO_W[S.assocPriority[a.assoc]] || 0) * .5) : (a, b) => (a.pillar + a.title).localeCompare(b.pillar + b.title));
     const d = dist(list);
-    return `<div class="page-head"><div><h1>Biblioteca de pautas</h1><p>${S.ideas.length} pautas organizadas por pilar, público, objetivo e etapa. Comece por aqui em vez da página em branco.</p></div>
+    return `<div class="page-head"><div><h1>Biblioteca <em>de pautas</em></h1><p>${S.ideas.length} pautas organizadas por pilar, público, objetivo e etapa. Comece por aqui em vez da página em branco.</p></div>
       <div class="head-actions"><button class="btn primary sm" data-act="new-idea">Nova pauta</button></div></div>
       ${filterBar(`<input type="search" id="lib-q" placeholder="Buscar tema, ângulo, problema" value="${esc(UI.libQuery)}" style="width:220px;padding:5px 9px;font-size:12.5px">`)}
       <div class="spread">${seg('lib-scope', [['all', 'Todas'], ['out', 'Fora do calendário'], ['in', 'No calendário']], UI.libScope)}
@@ -578,7 +578,7 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
         <div class="card stack"><div class="spread"><h2>Briefing</h2><div class="row"><button class="btn sm" data-act="copy-brief" data-id="${it.id}">Copiar briefing</button>${statusIdx(it.status) < statusIdx('aprovado') ? `<button class="btn primary sm" data-act="advance" data-id="${it.id}">Avançar para ${M.status[STATUS_ORDER[statusIdx(it.status) + 1]].name}</button>` : ''}</div></div>
         <pre class="brief" id="brief-text">${esc(briefText(it))}</pre></div>`;
     }
-    return `<div class="page-head"><div><h1>Produção</h1><p>Da pauta ao briefing em oito passos. Os campos chegam preenchidos pela estratégia; ajuste só o necessário.</p></div></div>
+    return `<div class="page-head"><div><h1>Produção <em>e briefing</em></h1><p>Da pauta ao briefing em oito passos. Os campos chegam preenchidos pela estratégia; ajuste só o necessário.</p></div></div>
       <div class="grid" style="grid-template-columns:280px minmax(0,1fr);align-items:start" id="prod-layout">
         <div class="card" style="padding:8px"><div class="label" style="padding:6px 8px">Fila de produção · ${queue.length}</div><p class="tiny muted" style="padding:0 8px 6px">De Ideia a Produção. Aprovados saem da fila.</p>
           ${queue.map(q => `<div class="queue-item ${q.id === UI.prodId ? 'on' : ''}" data-act="prod-pick" data-id="${q.id}"><span class="small" style="font-weight:550">${esc(q.title)}</span><span class="row tiny muted"><i class="st-dot" style="background:${M.stage[q.stage].color}"></i>${fmtD(q.date)} · ${M.status[q.status].name}</span></div>`).join('')}</div>
@@ -613,11 +613,11 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
     const list = S.radar.map(n => Object.assign({ c: radarClass(n) }, { n }));
     const counts = countBy(list.map(x => ({ k: x.c.cls })), 'k');
     const shown = list.filter(x => UI.radarFilter === 'todos' || x.c.cls === UI.radarFilter).sort((a, b) => b.c.sc - a.c.sc);
-    return `<div class="page-head"><div><h1>Radar de pautas</h1><p>Notícias, estudos e tendências avaliados por relevância e posicionamento antes de virar conteúdo. Em alta não é critério.</p></div>
+    return `<div class="page-head"><div><h1>Radar <em>de pautas</em></h1><p>Notícias, estudos e tendências avaliados por relevância e posicionamento antes de virar conteúdo. Em alta não é critério.</p></div>
       <div class="head-actions"><button class="btn primary sm" data-act="radar-new">Cadastrar fonte</button></div></div>
       <div class="notice">Itens marcados como <b>exemplo simulado</b> servem só para demonstrar o filtro. Os demais vêm das fontes citadas no documento de 04/11.</div>
       <div class="row">${seg('radar-filter', [['todos', `Todos ${list.length}`]].concat(Object.entries(RCLASS).map(([k, v]) => [k, `${v.s} ${counts[k] || 0}`])), UI.radarFilter)}</div>
-      <div class="stack">${shown.map(({ n, c }) => `<div class="card flat" style="padding:14px 16px"><div class="spread" style="align-items:flex-start">
+      <div class="stack">${shown.map(({ n, c }) => `<div class="card" style="padding:18px 22px"><div class="spread" style="align-items:flex-start">
         <div class="stack" style="gap:6px;flex:1;min-width:0"><div class="chips">${chip(RCLASS[c.cls].n, RCLASS[c.cls].c)}${chip('Prioridade ' + PRIO_N[c.prio])}${n.simulated ? chip('exemplo simulado', 'crit') : ''}${n.status === 'convertido' ? chip('virou pauta', 'okc') : ''}${chip(n.kind)}</div>
           <h3 style="font-size:14.5px">${esc(n.title)}</h3><span class="small muted">${esc(n.source)} · ${fmtD(n.date)}${n.url ? ` · <a href="${esc(n.url)}" target="_blank" rel="noopener">abrir fonte</a>` : ''}</span>${n.notes ? `<span class="tiny" style="color:var(--warn)">${esc(n.notes)}</span>` : ''}</div>
         <div class="stack" style="align-items:flex-end;gap:8px"><span class="score">${c.sc}<span class="tiny muted">/100</span></span><div class="row"><button class="btn sm" data-act="radar-eval" data-id="${n.id}">Avaliar</button>${c.cls !== 'descartar' ? `<button class="btn primary sm" data-act="radar-convert" data-id="${n.id}">Transformar em pauta</button>` : ''}</div></div></div></div>`).join('') || '<div class="empty">Nada nesta classificação.</div>'}</div>
@@ -656,7 +656,7 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
     const totalLeads = sum('leads');
     if (totalLeads) ins.push({ t: `${totalLeads} leads registrados: ${Object.entries(leadsBy).filter(([, v]) => v).map(([k, v]) => `${M.stage[k].name} ${v}`).join(', ')}.`, a: 'Leads de conteúdo orgânico são contagem de contatos, não receita atribuída.' });
     const sorted = pub.slice().sort(UI.perfSort === 'reach' ? (a, b) => b.metrics.alcance - a.metrics.alcance : UI.perfSort === 'eng' ? (a, b) => engRate(b.metrics) - engRate(a.metrics) : (a, b) => b.date.localeCompare(a.date));
-    return `<div class="page-head"><div><h1>Desempenho</h1><p>O que os conteúdos publicados geraram. Cada etapa é avaliada pela métrica da sua função.</p></div>
+    return `<div class="page-head"><div><h1>Desempenho <em>publicado</em></h1><p>O que os conteúdos publicados geraram. Cada etapa é avaliada pela métrica da sua função.</p></div>
       <div class="head-actions">${seg('perf-mode', [['all', 'Tudo'], ['30', 'Últimos 30 dias'], ['month', 'Mês atual']], mode)}</div></div>
       ${pub.some(i => i.demo) ? '<div class="notice demo"><b>Dados de demonstração.</b> As métricas de outubro e da primeira semana de novembro são fictícias, para mostrar a análise. Registre os números reais no detalhe de cada conteúdo publicado; a estrutura já está pronta para receber dados das redes.</div>' : ''}
       ${filterBar()}
@@ -698,7 +698,7 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
     const month = { from: monthStart(S.calRef), to: monthEnd(S.calRef) };
     const calMonth = planned(month, S.items.filter(() => true));
     if (t.cur === 'posicionamento') body = `
-      <div class="card stack" style="gap:14px"><span class="label">Promessa</span><p style="font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1.1">${esc(P.promise)}</p><p class="prose" style="font-size:15px">${esc(P.statement)}</p></div>
+      <div class="card stack" style="gap:14px"><span class="label">Promessa</span><p class="promise">${esc(P.promise.replace(/ Agir\.$/, ''))} <em>Agir.</em></p><p class="prose" style="font-size:15px">${esc(P.statement)}</p></div>
       <div class="grid g2"><div class="card stack"><span class="label">Categoria</span><h2>${esc(P.category)}</h2><p class="prose small">${esc(P.categoryWhy)}</p></div>
         <div class="card stack"><span class="label">Arquitetura da comunicação</span>${P.layers.map(l => `<div><b class="small">${esc(l.k)}</b><p class="small muted">${esc(l.v)}</p></div>`).join('')}</div></div>
       <div class="grid g3">${[['Benefícios funcionais', P.functional], ['Benefícios financeiros', P.financial], ['Benefícios emocionais', P.emotional]].map(([h, arr]) => `<div class="card"><div class="card-head"><h3>${h}</h3></div><ul class="small" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2)">${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div>
@@ -710,7 +710,7 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
         <dl class="flow"><dt>Temas</dt><dd>${a.themes.map(esc).join(' · ')}</dd><dt>Provas</dt><dd>${a.proofs.map(esc).join(' · ')}</dd><dt>Tipos</dt><dd>${a.types.map(x => M.type[x].name).join(' · ')}</dd><dt>Pilares</dt><dd>${pils.map(p => esc(p.name)).join(' · ')}</dd></dl>
         <div class="row tiny muted"><span>${nI} pautas na biblioteca</span><span>·</span><span>${nC} no calendário do mês</span><a href="#biblioteca" data-act="lib-assoc" data-v="${a.id}" style="margin-left:auto">Ver pautas</a></div></div>`; }).join('')}</div>`;
     if (t.cur === 'lembranca') body = `<p class="small muted">Situações em que o público deve lembrar da Elevah (category entry points). São hipóteses a validar em entrevistas com clientes e leads.</p>
-      <div class="card flat" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Situação de necessidade</th><th>Associação</th><th>Pilar</th><th>Quem vive</th><th class="n">Pautas</th><th></th></tr></thead><tbody>
+      <div class="card" style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Situação de necessidade</th><th>Associação</th><th>Pilar</th><th>Quem vive</th><th class="n">Pautas</th><th></th></tr></thead><tbody>
       ${E.entryPoints.map(e => { const n = S.ideas.filter(i => i.pillar === e.pillar && i.assoc === e.assoc).length; return `<tr><td style="min-width:260px">"${esc(e.s)}"</td><td>${chip(M.assoc[e.assoc].name)}</td><td>${pillarChip(e.pillar)}</td><td class="small">${esc(M.role[e.who].name)}</td><td class="n">${n}</td><td><button class="btn ghost sm" data-act="lib-pillar" data-v="${e.pillar}">Ver pautas</button></td></tr>`; }).join('')}</tbody></table></div></div>`;
     if (t.cur === 'prioridades') {
       const last = S.changeLog[S.changeLog.length - 1];
@@ -728,13 +728,13 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
           ${locked.length ? `<div><span class="label">Aprovados ou agendados: marcados para revisão, nada foi alterado</span><div class="stack" style="gap:4px;margin-top:6px">${locked.map(i => `<div class="rec-sug"><span class="small">${esc(i.title)} <span class="tiny muted">· ${fmtD(i.date)} · ${M.status[i.status].name}</span></span><button class="btn sm" data-act="open-item" data-id="${i.id}">Revisar</button></div>`).join('')}</div></div>` : ''}</div>`;
       }
       body = `<p class="small muted">Mudanças de prioridade reordenam as sugestões da biblioteca e do painel. Conteúdos aprovados nunca são alterados automaticamente: recebem uma marca de revisão.</p>
-        <div class="grid g-main" style="align-items:start"><div class="stack">${E.associations.map(a => `<div class="card flat stack" style="gap:10px"><div class="spread"><h3>${esc(a.name)}</h3>${seg('assoc-prio-' + a.id, [['alta', 'Alta'], ['media', 'Média'], ['baixa', 'Baixa']], S.assocPriority[a.id])}</div>
+        <div class="grid g-main" style="align-items:start"><div class="stack">${E.associations.map(a => `<div class="card stack" style="gap:10px"><div class="spread"><h3>${esc(a.name)}</h3>${seg('assoc-prio-' + a.id, [['alta', 'Alta'], ['media', 'Média'], ['baixa', 'Baixa']], S.assocPriority[a.id])}</div>
           <label class="field"><span>Mensagem central</span><textarea data-bind="assocmsg:${a.id}" rows="2">${esc(S.assocMsg[a.id])}</textarea></label></div>`).join('')}</div>
         <div class="stack"><div class="card"><div class="card-head"><h2>Impacto da mudança</h2></div>${impact}</div>
           <div class="card"><div class="card-head"><h3>Histórico</h3></div>${S.changeLog.length ? `<div class="stack small">${S.changeLog.slice().reverse().slice(0, 8).map(c => `<div><b>${esc(M.assoc[c.assoc].name)}</b> · ${esc(c.what)} <span class="muted tiny">${esc(c.at)}</span></div>`).join('')}</div>` : '<p class="small muted">Sem mudanças registradas.</p>'}</div></div></div>`;
     }
     if (t.cur === 'crescimento') body = growthPlan();
-    return `<div class="page-head"><div><h1>Posicionamento e marca</h1><p>A base que orienta cada pauta. Uma marca para todos os perfis; segmentos entram como exemplos de problemas comuns.</p></div></div>${t.html}${body}`;
+    return `<div class="page-head"><div><h1>Posicionamento <em>e marca</em></h1><p>A base que orienta cada pauta. Uma marca para todos os perfis; segmentos entram como exemplos de problemas comuns.</p></div></div>${t.html}${body}`;
   };
   function growthPlan() {
     const tp = E.targetPresets[0];
@@ -757,19 +757,19 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
   views.publicos = function () {
     const t = tabs('publicos', [['matriz', 'Matriz de públicos'], ['papeis', 'Papéis decisores'], ['perfis', 'Perfis atendidos'], ['territorios', 'Territórios compartilhados']]);
     let body = '';
-    if (t.cur === 'matriz') body = `<p class="small muted">Perfil → papel decisor → problema → desejo → associação → tema → abordagem → solução.</p><div class="card flat" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Perfil</th><th>Papel</th><th>Problema</th><th>Desejo</th><th>Associação</th><th>Tema</th><th>Abordagem</th><th>Solução Elevah</th></tr></thead><tbody>
+    if (t.cur === 'matriz') body = `<p class="small muted">Perfil → papel decisor → problema → desejo → associação → tema → abordagem → solução.</p><div class="card" style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Perfil</th><th>Papel</th><th>Problema</th><th>Desejo</th><th>Associação</th><th>Tema</th><th>Abordagem</th><th>Solução Elevah</th></tr></thead><tbody>
       ${E.audienceMatrix.map(r => `<tr><td><b class="small">${r.profile === 'todos' ? 'Todos' : esc(M.profile[r.profile].name)}</b></td><td class="small">${esc(M.role[r.role].name)}</td><td class="small">${esc(r.problem)}</td><td class="small">${esc(r.desire)}</td><td>${chip(M.assoc[r.assoc].name)}</td><td class="small">${esc(r.theme)}</td><td class="small">${esc(r.approach)}</td><td class="small muted">${esc(r.solution)}</td></tr>`).join('')}</tbody></table></div></div>`;
     if (t.cur === 'papeis') { const month = { from: monthStart(S.calRef), to: monthEnd(S.calRef) }; body = `<div class="grid g3">${E.roles.map(r => { const nI = S.ideas.filter(i => i.audience === r.id).length; const nC = planned(month).filter(i => i.audience === r.id).length; return `<div class="card stack"><h3>${esc(r.name)}</h3><div><span class="label">Dores</span><p class="small">${esc(r.pains)}</p></div><div><span class="label">Quer</span><p class="small">${esc(r.wants)}</p></div><div class="row tiny muted"><span>${nI} pautas</span>·<span>${nC} no mês</span><a href="#biblioteca" data-act="lib-audience" data-v="${r.id}" style="margin-left:auto">Ver pautas</a></div></div>`; }).join('')}</div>`; }
     if (t.cur === 'perfis') body = `<p class="small muted">Perfis do documento de ofertas. Na comunicação, servem de exemplo e de campanha dirigida, sem fragmentar a marca. Preços são hipóteses comerciais.</p><div class="grid g3">${E.profiles.map(p => `<div class="card stack"><div><span class="label">${esc(p.who)}</span><h3>${esc(p.name)}</h3></div><p class="small"><b>Papel da Elevah:</b> ${esc(p.role)}</p><p class="small"><b>Gancho de conteúdo:</b> ${esc(p.hook)}</p><p class="tiny muted">Preço sugerido (hipótese): ${esc(p.price)}</p></div>`).join('')}</div>`;
-    if (t.cur === 'territorios') body = `<p class="small muted">Relevância de cada tema por perfil (0–3). Para descoberta, prefira temas fortes em vários perfis ao mesmo tempo: ampliam alcance sem perder clareza.</p><div class="card flat"><div class="tbl-wrap"><table class="heat"><thead><tr><th>Tema</th>${E.profiles.map(p => `<th>${esc(p.name)}</th>`).join('')}<th class="n">Alcance</th></tr></thead><tbody>
+    if (t.cur === 'territorios') body = `<p class="small muted">Relevância de cada tema por perfil (0–3). Para descoberta, prefira temas fortes em vários perfis ao mesmo tempo: ampliam alcance sem perder clareza.</p><div class="card"><div class="tbl-wrap"><table class="heat"><thead><tr><th>Tema</th>${E.profiles.map(p => `<th>${esc(p.name)}</th>`).join('')}<th class="n">Alcance</th></tr></thead><tbody>
       ${E.sharedTerritories.map(t2 => { const tot = Object.values(t2.rel).filter(v => v >= 2).length; return `<tr><td>${esc(t2.theme)}</td>${E.profiles.map(p => `<td class="h${t2.rel[p.id]}">${t2.rel[p.id] || '·'}</td>`).join('')}<td class="n">${tot}/7</td></tr>`; }).join('')}</tbody></table></div></div>`;
-    return `<div class="page-head"><div><h1>Públicos</h1><p>Quem decide, o que sente e quais interesses são compartilhados entre os perfis.</p></div></div>${t.html}${body}`;
+    return `<div class="page-head"><div><h1>Públicos <em>e decisores</em></h1><p>Quem decide, o que sente e quais interesses são compartilhados entre os perfis.</p></div></div>${t.html}${body}`;
   };
 
   /* ---------- Pilares ---------- */
   views.pilares = function () {
     const month = { from: monthStart(S.calRef), to: monthEnd(S.calRef) }; const cm = planned(month);
-    return `<div class="page-head"><div><h1>Pilares editoriais</h1><p>Pilar → tema → subtema → pauta → ângulo → conteúdo. Clique num subtema para ver as pautas.</p></div></div>
+    return `<div class="page-head"><div><h1>Pilares <em>editoriais</em></h1><p>Pilar → tema → subtema → pauta → ângulo → conteúdo. Clique num subtema para ver as pautas.</p></div></div>
       <div class="stack">${E.pillars.map(p => { const nI = S.ideas.filter(i => i.pillar === p.id).length; const nC = cm.filter(i => i.pillar === p.id).length; const open = UI.open[p.id]; return `<div class="pillar">
         <div class="pillar-h" data-act="toggle-pillar" data-v="${p.id}"><span class="pillar-sw" style="background:${p.color}"></span><div style="flex:1;min-width:0"><h2>${esc(p.name)}</h2><p class="small muted">${esc(p.goal)}</p></div>
           <div class="stack" style="align-items:flex-end;gap:2px"><span class="small num">${nI} pautas</span><span class="tiny muted">${nC} no mês</span></div><span class="muted">${open ? '−' : '+'}</span></div>
@@ -785,15 +785,15 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
   views.referencias = function () {
     const t = tabs('ref', [['fund', 'Fundamentação'], ['funil', 'Funil e objetivos'], ['tipos', 'Tipos editoriais'], ['formatos', 'Formatos'], ['frameworks', 'Frameworks'], ['regras', 'Regras de cálculo']]);
     let body = '';
-    if (t.cur === 'fund') body = `<p class="small muted">Cada referência indica o tipo de evidência. Modelo e recomendação não são lei; hipóteses precisam de dados da própria Elevah.</p><div class="card flat" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Referência</th><th>Tipo</th><th>Contribuição para a estratégia</th><th>Limites</th></tr></thead><tbody>
+    if (t.cur === 'fund') body = `<p class="small muted">Cada referência indica o tipo de evidência. Modelo e recomendação não são lei; hipóteses precisam de dados da própria Elevah.</p><div class="card" style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Referência</th><th>Tipo</th><th>Contribuição para a estratégia</th><th>Limites</th></tr></thead><tbody>
       ${E.references.map(r => `<tr><td style="min-width:200px"><b class="small">${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.ref)}</a>` : esc(r.ref)}</b></td><td>${chip(r.kind, /Hipótese/.test(r.kind) ? 'flag' : /científica|empírica|experimental/i.test(r.kind) ? 'okc' : '')}</td><td class="small">${esc(r.use)}</td><td class="small muted">${esc(r.limit)}</td></tr>`).join('')}</tbody></table></div></div>`;
     if (t.cur === 'funil') body = `<div class="notice">Etapa do funil, objetivo, tema e formato são dimensões diferentes. Um carrossel pode ser descoberta ou conversão: classifique pela intenção, pela mensagem e pela ação esperada.</div>
       <div class="grid g2"><div class="card"><div class="card-head"><h2>Funil de comunicação</h2></div><div class="stack">${E.stages.map(s => `<div class="stack" style="gap:3px">${stageChip(s.id)}<span class="small">${esc(s.fn)}</span><span class="tiny muted">Ação: ${esc(s.action)} · Métricas: ${s.metrics.join(', ')}</span></div>`).join('')}</div></div>
       <div class="stack"><div class="card"><div class="card-head"><h2>Funil comercial</h2></div><div class="row small">${['Seguidor ou visitante', 'Lead (pediu diagnóstico)', 'Conversa', 'Proposta', 'Cliente', 'Receita'].map((x, i) => `${i ? '<span class="muted">→</span>' : ''}<span class="chip">${x}</span>`).join(' ')}</div><p class="small muted" style="margin-top:10px">Relacionados, não equivalentes. O conteúdo alimenta o topo do funil comercial; a conversão comercial depende de atendimento, diagnóstico e proposta. Só conteúdos com link rastreado podem ter receita atribuída.</p></div>
       <div class="card"><div class="card-head"><h2>Objetivos</h2></div><div class="tbl-wrap"><table><thead><tr><th>Objetivo</th><th>Etapa mais comum</th></tr></thead><tbody>${E.objectives.map(o => `<tr><td class="small">${esc(o.name)}</td><td>${stageChip(o.stage)}</td></tr>`).join('')}</tbody></table></div></div></div></div>`;
-    if (t.cur === 'tipos') body = `<div class="card flat" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Tipo</th><th>Objetivo</th><th>Etapa</th><th>Público</th><th>Quando funciona</th><th>Estruturas</th><th>Formatos</th><th>Exemplo</th><th>CTA</th><th>Métricas</th></tr></thead><tbody>
+    if (t.cur === 'tipos') body = `<div class="card" style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Tipo</th><th>Objetivo</th><th>Etapa</th><th>Público</th><th>Quando funciona</th><th>Estruturas</th><th>Formatos</th><th>Exemplo</th><th>CTA</th><th>Métricas</th></tr></thead><tbody>
       ${E.types.map(x => `<tr><td><b class="small">${esc(x.name)}</b></td><td class="small">${esc(x.goal)}</td><td>${stageChip(x.stage)}</td><td class="small">${esc(x.who)}</td><td class="small">${esc(x.when)}</td><td class="small">${x.fw.map(f => M.fw[f].name.split(' (')[0]).join(', ')}</td><td class="small">${x.fo.map(f => M.fmt[f].name).join(', ')}</td><td class="small muted">${esc(x.ex)}</td><td class="small">${esc(x.cta)}</td><td class="small muted">${esc(x.kpi)}</td></tr>`).join('')}</tbody></table></div></div>`;
-    if (t.cur === 'formatos') body = `<div class="card flat" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Formato</th><th>Canais</th><th>Esforço</th><th>Especificação</th><th>Bom para</th><th>Cuidados</th></tr></thead><tbody>
+    if (t.cur === 'formatos') body = `<div class="card" style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Formato</th><th>Canais</th><th>Esforço</th><th>Especificação</th><th>Bom para</th><th>Cuidados</th></tr></thead><tbody>
       ${E.formats.map(f => `<tr><td><b class="small">${esc(f.name)}</b></td><td class="small">${f.ch.map(c => M.ch[c].name).join(', ')}</td><td class="prio">${'●'.repeat(f.effort)}${'○'.repeat(3 - f.effort)}</td><td class="small">${esc(f.spec)}</td><td class="small">${esc(f.good)}</td><td class="small muted">${esc(f.care)}</td></tr>`).join('')}</tbody></table></div></div>`;
     if (t.cur === 'frameworks') body = `<div class="grid g3">${E.frameworks.map(f => `<div class="card stack"><h3>${esc(f.name)}</h3><p class="small">${esc(f.goal)}. <span class="muted">${esc(f.when)}.</span></p><div class="chips">${f.steps.map(s => chip(s)).join('')}</div><p class="tiny"><b>+</b> ${esc(f.pros)}</p><p class="tiny muted"><b>−</b> ${esc(f.cons)}</p><p class="tiny"><span class="label">Exemplo Elevah</span><br>${esc(f.ex)}</p></div>`).join('')}</div>`;
     if (t.cur === 'regras') body = `<div class="card stack prose"><h2>Regras de cálculo</h2>
@@ -805,7 +805,7 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
       <p><b>Esforço</b> (1 a 3 por formato) é uma métrica complementar de capacidade e não entra na distribuição.</p>
       <p><b>Engajamento</b> = (salvamentos + compartilhamentos + comentários) ÷ alcance. Curtidas não entram.</p>
       <p><b>Radar.</b> Pontuação ponderada de 9 critérios (0–3), normalizada para 0–100.</p></div>`;
-    return `<div class="page-head"><div><h1>Referências</h1><p>Fundamentação, classificações e regras que a ferramenta usa.</p></div></div>${t.html}${body}`;
+    return `<div class="page-head"><div><h1>Referências <em>e regras</em></h1><p>Fundamentação, classificações e regras que a ferramenta usa.</p></div></div>${t.html}${body}`;
   };
 
   /* ---------- Ajustes ---------- */
@@ -1221,8 +1221,11 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
     const newRadar = S.radar.filter(n => n.status === 'novo' && radarClass(n).cls !== 'descartar').length;
     const reviews = S.items.filter(i => i.review).length;
     const badge = id => id === 'radar' && newRadar ? `<span class="badge">${newRadar}</span>` : id === 'calendario' && reviews ? `<span class="badge" title="Conteúdos para revisar">${reviews}</span>` : '';
-    document.getElementById('nav').innerHTML = NAV.map(([g, items]) => `<div class="nav-group">${g}</div>${items.map(([id, l, d]) => `<a href="#${id}" class="${id === cur ? 'on' : ''}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>${l}${badge(id)}</a>`).join('')}`).join('');
-    document.getElementById('topbar').innerHTML = NAV.flatMap(([, items]) => items).map(([id, l]) => `<a href="#${id}" class="${id === cur ? 'on' : ''}">${l}</a>`).join('');
+    const gi = Math.max(0, NAV.findIndex(([, items]) => items.some(([id]) => id === cur)));
+    document.getElementById('areas').innerHTML = `<div class="seg lg">${NAV.map(([g], i) => `<button data-act="area" data-v="${i}" class="${i === gi ? 'on' : ''}">${g}</button>`).join('')}</div>`;
+    document.getElementById('side-title').textContent = NAV[gi][0];
+    document.getElementById('nav').innerHTML = NAV[gi][1].map(([id, l, d]) => `<a href="#${id}" class="${id === cur ? 'on' : ''}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg><span>${l}</span>${badge(id)}</a>`).join('');
+    document.getElementById('top-right').innerHTML = `<a class="gbtn" href="#radar">Radar${newRadar ? ` <span class="badge">${newRadar}</span>` : ''}</a>`;
   }
   function render() {
     // filtro auxiliar por associação vindo de outras páginas (biblioteca)
@@ -1238,6 +1241,7 @@ ${[it.ex || idea.ex ? '  · Usa números ilustrativos: sinalizar na peça.' : ''
     const pl = document.getElementById('prod-layout'); if (pl && window.innerWidth < 900) pl.style.gridTemplateColumns = 'minmax(0,1fr)';
   }
   A['clear-assoc'] = () => { UI.assocFilter = null; render(); };
+  A['area'] = el => { location.hash = NAV[Number(el.dataset.v)][1][0][0]; };
 
   /* Eventos delegados */
   document.addEventListener('click', ev => {

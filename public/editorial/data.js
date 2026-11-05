@@ -209,7 +209,7 @@ window.ELEVAH = (function () {
   /* 4. Pilares → Temas → Subtemas                                        */
   /* ------------------------------------------------------------------ */
   const pillars = [
-    { id: 'p1', name: 'Previsibilidade e decisão', color: '#2f7d6d',
+    { id: 'p1', name: 'Previsibilidade e decisão', color: '#0d0d0f',
       goal: 'Fazer da Elevah a marca lembrada quando o assunto é saber o resultado antes do fechamento.',
       assoc: ['antecipacao', 'rigor'], audience: ['dono', 'gestor', 'financeiro'],
       problems: ['Resultado descoberto no fim do mês', 'Meta sem acompanhamento', 'Imprevistos sem plano'],
@@ -223,7 +223,7 @@ window.ELEVAH = (function () {
         { id: 'p1-indicadores', name: 'Ler indicadores', subs: ['Efetivo, vigente e projeção', 'Comparações que enganam', 'Métrica de vaidade × métrica de decisão'] },
         { id: 'p1-cenarios', name: 'Cenários e sazonalidade', subs: ['Testar premissas', 'Calendário de sazonalidade', 'Contratação e expansão'] }
       ] },
-    { id: 'p2', name: 'Margem e eficiência', color: '#9a6a1f',
+    { id: 'p2', name: 'Margem e eficiência', color: '#1a6fbf',
       goal: 'Associar a Elevah a enxergar o dinheiro que escapa: margem, estoque, hora parada, ferramentas.',
       assoc: ['impacto'], audience: ['dono', 'financeiro', 'ops'],
       problems: ['Vende muito e sobra pouco', 'Estoque parado e vencendo', 'Desconto sem controle', 'Agenda ociosa'],
@@ -237,7 +237,7 @@ window.ELEVAH = (function () {
         { id: 'p2-capacidade', name: 'Custo da capacidade', subs: ['Custo da hora', 'Ocupação por horário', 'Imprevistos de equipe'] },
         { id: 'p2-pilha', name: 'Ferramentas e retrabalho', subs: ['Custo da pilha avulsa', 'Retrabalho e conferência manual'] }
       ] },
-    { id: 'p3', name: 'Clientes e recorrência', color: '#b0456d',
+    { id: 'p3', name: 'Clientes e recorrência', color: '#3d9be9',
       goal: 'Ser a referência em crescer com a base: retorno, recompra, resposta rápida, voz do cliente.',
       assoc: ['base', 'acao'], audience: ['dono', 'gestor', 'mkt'],
       problems: ['Cliente some sem avisar', 'Resposta lenta', 'Campanha para todo mundo', 'Reclamação sem resposta'],
@@ -251,7 +251,7 @@ window.ELEVAH = (function () {
         { id: 'p3-segmentos', name: 'Segmentação útil', subs: ['Cliente certo para o produto', 'Campanha para a base certa', 'LTV na prática'] },
         { id: 'p3-voz', name: 'Voz do cliente', subs: ['Reclamação que custa dinheiro', 'Avaliações dos concorrentes'] }
       ] },
-    { id: 'p4', name: 'Marketing que se mede em venda', color: '#4b5fc9',
+    { id: 'p4', name: 'Marketing que se mede em venda', color: '#a6d6f7',
       goal: 'Ligar a marca à ideia de que conteúdo e anúncio se medem em cliente e receita.',
       assoc: ['integrada'], audience: ['mkt', 'autonomo', 'parceiro'],
       problems: ['Investe sem saber o que volta', 'Métrica de curtida', 'Relatório sem venda'],
@@ -265,7 +265,7 @@ window.ELEVAH = (function () {
         { id: 'p4-funil', name: 'Funil de receita', subs: ['Vazamentos', 'Coortes', 'Relatório que renova contrato'] },
         { id: 'p4-conteudo', name: 'Conteúdo e anúncio', subs: ['Métricas de vaidade', 'Experimentação', 'Cortar o que não vende'] }
       ] },
-    { id: 'p5', name: 'Mercado e tendências', color: '#6b5a9e',
+    { id: 'p5', name: 'Mercado e tendências', color: '#8e8e93',
       goal: 'Dar repertório: pesquisas, movimentos setoriais e IA aplicada, sempre com leitura própria.',
       assoc: ['rigor', 'antecipacao'], audience: ['dono', 'parceiro', 'mkt'],
       problems: ['Excesso de notícia sem leitura', 'Hype de IA', 'Mudança de comportamento do cliente'],
@@ -279,7 +279,7 @@ window.ELEVAH = (function () {
         { id: 'p5-comportamento', name: 'Comportamento do consumidor', subs: ['WhatsApp como balcão', 'Autoatendimento', 'Expectativa de resposta'] },
         { id: 'p5-setores', name: 'Movimentos por setor', subs: ['Contabilidade consultiva', 'Farmácia independente', 'Serviços recorrentes'] }
       ] },
-    { id: 'p6', name: 'Gestão e equipe', color: '#3d7aa8',
+    { id: 'p6', name: 'Gestão e equipe', color: '#d4d4d8',
       goal: 'Associar a Elevah a uma gestão simples: cada um vê o seu número, o dono começa pelo que vale mais.',
       assoc: ['acao', 'integrada'], audience: ['dono', 'gestor'],
       problems: ['Microgestão', 'Planilha de comissão', 'Processos manuais', 'Dono apagando incêndio'],
@@ -292,7 +292,7 @@ window.ELEVAH = (function () {
         { id: 'p6-processos', name: 'Processos sem atrito', subs: ['Do orçamento à nota', 'Um sistema em vez de cinco'] },
         { id: 'p6-rotina', name: 'Rotina do dono', subs: ['2 minutos por dia', 'Priorizar por R$', 'Fechamento mensal'] }
       ] },
-    { id: 'p7', name: 'Elevah na prática', color: '#7a808d',
+    { id: 'p7', name: 'Elevah na prática', color: '#cfe8fa',
       goal: 'Mostrar o método e o produto pronto, com transparência, para quem já tem interesse.',
       assoc: ['acao', 'rigor', 'antecipacao'], audience: ['dono', 'gestor', 'autonomo'],
       problems: ['Dúvida se funciona no meu negócio', 'Preço', 'Medo de migração'],

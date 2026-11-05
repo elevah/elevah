@@ -4,22 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Elevah Editorial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap">
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
+<div class="top"><div class="topin">
+  <div class="brand"><span class="brand-mark">E</span><div>Elevah<small>Sistema editorial</small></div></div>
+  <nav class="areas" id="areas" aria-label="Áreas"></nav>
+  <div class="top-right" id="top-right"></div>
+</div></div>
 <div class="app">
-  <aside class="side">
-    <div class="brand"><span class="brand-mark">E</span><div><b>Elevah Editorial</b><small>Ver antes. Saber o impacto. Agir.</small></div></div>
-    <nav class="nav" id="nav" aria-label="Áreas"></nav>
+  <aside class="side" aria-label="Páginas">
+    <div class="sideh"><span id="side-title"></span></div>
+    <nav class="nav" id="nav"></nav>
     <div class="side-foot">Salvo neste navegador. Métricas de out/nov são de demonstração.</div>
   </aside>
-  <div style="min-width:0">
-    <nav class="topbar" id="topbar" aria-label="Áreas"></nav>
-    <main class="main" id="view"></main>
-  </div>
+  <main class="main" id="view"></main>
 </div>
 <div id="drawer-root"></div>
 <div id="toast" class="toast" hidden role="status"></div>
