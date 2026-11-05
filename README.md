@@ -1,3 +1,16 @@
+# Elevah
+
+## Sistema editorial (estratégia de conteúdo)
+
+Ferramenta de planejamento editorial da Elevah: posicionamento, associações de marca, públicos, pilares, biblioteca com 71 pautas, calendário (mês, semana, lista, pipeline), metas de distribuição por funil, editor de produção com briefing, radar de notícias e painel de desempenho.
+
+- **Abrir:** `public/editorial/index.html` direto no navegador, ou `npm run dev` e acessar `/editorial/`.
+- **Estratégia completa:** [`docs/estrategia-de-conteudo.md`](docs/estrategia-de-conteudo.md).
+- **Dados:** salvos no navegador (localStorage). Exportar/importar em Ajustes.
+- **Arquivos:** `data.js` (estratégia e dados iniciais), `app.js` (aplicação), `app.css` (estilos). Sem dependências.
+
+---
+
 # Astro Starter Kit: Blog
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/astro-blog-starter-template)
